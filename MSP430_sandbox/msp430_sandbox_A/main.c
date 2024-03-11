@@ -6,7 +6,6 @@ int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
-
 	// Initialize peripherals
 	gpio_init();
 	clock_init();

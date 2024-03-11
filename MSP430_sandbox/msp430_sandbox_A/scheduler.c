@@ -23,22 +23,19 @@ uint8_t scheduler_add_task(void (*function)(void), uint32_t timeSlot, uint32_t p
     // Error out if no gap in array
     if (task_index == MAX_TASKS)
     {
-        // Handle task list full error
-        // to do
-        return 0;
+        // Handle task list error - work to go
+        return MAX_TASKS;
     }
 
+    // Initialize the new task
     Task new_task;
 
-    // Initialize the new task
     new_task.taskFunction  = function;
     new_task.timeSlot      = timeSlot;
     new_task.period        = period;
     new_task.inQueue       = 0;
 
-    // Set initial execution time
-
-    // Copy the new task to the tasks array
+    // Copy the new task to the task_list array
     task_list[task_index] = new_task;
 
     // Increment the number of tasks
@@ -56,7 +53,7 @@ void scheduler_delete_task(const uint8_t task_index)
         task_list[task_index].timeSlot      = 0;
         task_list[task_index].inQueue       = 0;
     }
-
+    // Decrement the number of tasks
     numTasks--;
 }
 
