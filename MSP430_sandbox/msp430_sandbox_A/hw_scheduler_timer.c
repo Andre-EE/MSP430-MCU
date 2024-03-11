@@ -16,8 +16,8 @@ void scheduler_timer_init(void)
 
 void scheduler_sleep(void)
 {
-    __bis_SR_register(LPM0_bits + GIE);     // Enter LPM0 w/ interrupt
-    __no_operation();                       // For debugger
+    __bis_SR_register(LPM0_bits + GIE);             // Enter LPM0 w/ interrupt
+    __no_operation();                               // For debugger
 }
 
 // TIMER0_A0 interrupt service routine
