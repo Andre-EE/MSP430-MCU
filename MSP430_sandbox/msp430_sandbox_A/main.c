@@ -66,8 +66,8 @@ void simple_buffer_test(void)
         uart_ser_output("; size of buffer: ");
         uart_ser_output_int(size);
         uart_ser_output(" \r\n");
-
     }
+
     // Free the circular buffer
     cbuf_free(cb);
 }
