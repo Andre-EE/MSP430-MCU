@@ -21,4 +21,7 @@ void uart_ser_output(char *str);
 void uart_ser_output_int(uint8_t value);
 void uart_send_test_message(void);
 
+// DMA
+void dma_init(volatile uint8_t *rx_buffer);
+
 #endif /* HARDWARE_H_ */
