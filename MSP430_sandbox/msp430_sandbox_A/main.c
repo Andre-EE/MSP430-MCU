@@ -5,6 +5,8 @@
 
 #define BUFFER_SIZE 10
 
+volatile uint8_t rx_buffer[64];
+
 int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
@@ -14,8 +16,7 @@ int main(void)
 	clock_init();
 	scheduler_timer_init();
 	uart_init();
-
-	uart_init();
+	dma_init(rx_buffer);
 
 	uint8_t index_of_last_added_task;
 
