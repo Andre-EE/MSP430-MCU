@@ -12,6 +12,10 @@ void gpio_init(void)
     P1DIR |= BIT0;
     P4DIR |= BIT6;
 
+    // USCI_A0 UART pins
+    P2SEL1 |=   BIT0 | BIT1;
+    P2SEL0 &= ~(BIT0 | BIT1);
+
     // Disable the GPIO power-on default high-impedance mode to activate
     // previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;
