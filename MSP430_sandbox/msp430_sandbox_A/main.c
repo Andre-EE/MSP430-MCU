@@ -6,6 +6,7 @@
 #define BUFFER_SIZE 10
 
 volatile uint8_t rx_buffer[64];
+volatile uint16_t adc_buffer[2];
 
 int main(void)
 {
@@ -16,13 +17,16 @@ int main(void)
 	clock_init();
 	scheduler_timer_init();
 	uart_init();
-	dma_init(rx_buffer);
+	dma_init_uart(rx_buffer);
+	dma_init_adc(adc_buffer);
+    adc_init();
 
 	uint8_t index_of_last_added_task;
 
 	// Add LED tasks
 	index_of_last_added_task = scheduler_add_task(gpio_toggle_grn_led, 0, 8);
 	index_of_last_added_task = scheduler_add_task(gpio_toggle_red_led, 2, 4);
+	index_of_last_added_task = scheduler_add_task(adc_trigger_conversion, 4, 8);
 
 	simple_buffer_test();
 
@@ -72,3 +76,5 @@ void simple_buffer_test(void)
     // Free the circular buffer
     cbuf_free(cb);
 }
+
+

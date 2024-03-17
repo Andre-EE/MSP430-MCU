@@ -22,6 +22,11 @@ void uart_ser_output_int(uint8_t value);
 void uart_send_test_message(void);
 
 // DMA
-void dma_init(volatile uint8_t *rx_buffer);
+void dma_init_uart(volatile uint8_t *rx_buffer);
+void dma_init_adc(volatile uint16_t *adc_buffer);
+
+// ADC
+void adc_init(void);
+void adc_trigger_conversion(void);
 
 #endif /* HARDWARE_H_ */
