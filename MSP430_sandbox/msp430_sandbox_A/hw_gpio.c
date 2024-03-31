@@ -16,6 +16,10 @@ void gpio_init(void)
     P2SEL1 |=   BIT0 | BIT1;
     P2SEL0 &= ~(BIT0 | BIT1);
 
+    // PWM output
+    P3DIR  |= BIT4 | BIT5;                       // P3.4 and P3.5 -> output
+    P3SEL0 |= BIT4 | BIT5;                       // P3.4 (TB0.3) and P3.5 (TB0.4) options select
+
     // Disable the GPIO power-on default high-impedance mode to activate
     // previously configured port settings
     PM5CTL0 &= ~LOCKLPM5;

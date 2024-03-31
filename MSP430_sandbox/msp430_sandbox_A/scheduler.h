@@ -8,7 +8,7 @@
 
 // Task structure
 typedef struct {
-    void (  *taskFunction)(void); // Function pointer
+    void   (*taskFunction)(void); // Function pointer
     uint32_t timeSlot;      // Interval in milliseconds
     uint32_t period;        // Last execution time
     uint8_t  inQueue;        // Flag or count for execution

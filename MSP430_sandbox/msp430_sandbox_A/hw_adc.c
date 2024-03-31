@@ -32,9 +32,7 @@ void adc_init(void) //2 channel scan
 
 void adc_trigger_conversion(void)
 {
-    __no_operation();                           // For debugger
     ADC12CTL0 |= ADC12SC;                       // Start conversion-software trigger
-    __no_operation();                           // For debugger
 }
 
 //void adc_init(void) //single channel

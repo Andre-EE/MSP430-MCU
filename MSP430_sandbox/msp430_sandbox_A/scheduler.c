@@ -5,7 +5,8 @@ static Task task_list[MAX_TASKS];
 static uint8_t numTasks = 0;
 static uint8_t task_index = 0;
 
-void scheduler_init(void) {
+void scheduler_init(void)
+{
     // Initialize any necessary scheduler data structures or variables
     numTasks = 0;
 }

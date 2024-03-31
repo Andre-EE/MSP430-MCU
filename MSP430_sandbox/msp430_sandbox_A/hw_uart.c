@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <msp430.h>
 #include "hardware.h"
 
@@ -64,4 +63,10 @@ void uart_send_test_message(void)
 {
     char text [] = "abcdefghijklmnopqrstuvwxyz7";
     uart_ser_output(text);
+}
+
+void uart_trigger_tx(void)
+{
+    UCA0IFG &= ~UCTXIFG;
+    UCA0IFG |= UCTXIFG;
 }
