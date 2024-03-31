@@ -2,7 +2,7 @@
 #include "hardware.h"
 
 #define TICKS_PER_SECOND 32768
-#define SLOTS_PER_SECOND 8
+#define SLOTS_PER_SECOND 128
 
 void scheduler_timer_init(void)
 {

@@ -1,37 +1,23 @@
-#include <msp430.h> 
-#include "hardware.h"
-#include "scheduler.h"
-#include "buffer.h"
+#include "state_machine.h"
 
 #define BUFFER_SIZE 10
 
-volatile uint8_t rx_buffer[64];
-
 int main(void)
 {
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	
-	// Initialize peripherals
-	gpio_init();
-	clock_init();
-	scheduler_timer_init();
-	uart_init();
-	dma_init(rx_buffer);
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
 
-	uint8_t index_of_last_added_task;
+    //simple_buffer_test();
+    //tx_buffer = "Buffer is testing. data data. \r\n"
 
-	// Add LED tasks
-	index_of_last_added_task = scheduler_add_task(gpio_toggle_grn_led, 0, 8);
-	index_of_last_added_task = scheduler_add_task(gpio_toggle_red_led, 2, 4);
-
-	simple_buffer_test();
+    uint8_t index_of_last_added_task;
+    index_of_last_added_task = scheduler_add_task(fsm_update_state, 0, 1);
 
     while(1)
     {
         scheduler_run();
         scheduler_sleep();
     }
-	return 0;
+    return 0;
 }
 
 void simple_buffer_test(void)
