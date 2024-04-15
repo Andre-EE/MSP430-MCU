@@ -17,16 +17,7 @@ void clock_init(void);
 void scheduler_timer_init(void);
 void scheduler_sleep(void);
 
-// UART
-void uart_init(void);
-void uart_ser_output(char *str);
-void uart_ser_output_int(uint8_t value);
-void uart_send_test_message(void);
-void uart_trigger_tx(void);
-
 // DMA
-void dma_init_uart_rx(volatile uint8_t *rx_buffer);
-void dma_init_uart_tx(volatile unsigned char *tx_buffer);
 void dma_init_spi_rx(volatile uint8_t *rx_buffer);
 void dma_init_spi_tx(volatile unsigned char *tx_buffer);
 void dma_init_adc(volatile uint16_t *adc_buffer);

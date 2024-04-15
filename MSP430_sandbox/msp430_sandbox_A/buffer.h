@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "hardware.h"
+
+#define BUFFER_SIZE 10
 
 //#define NULL  ((void *)0)
 //typedef unsigned int size_t;
