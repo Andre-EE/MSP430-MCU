@@ -6,6 +6,7 @@
 typedef enum {
     INIT,
     ADC_SAMPLE,
+    SPI_COMM,
     PROCESS
 } state_t;
 
@@ -14,6 +15,8 @@ static state_t current_state = INIT;
 //DMA buffers
 volatile unsigned char  rx_buffer[2];
 volatile unsigned char  tx_buffer[TX_BUFFER_SIZE];
+volatile unsigned char  spi_rx_buffer[8];
+volatile unsigned char  spi_tx_buffer[8];
 volatile uint16_t       adc_buffer[2];
 
 //ADC variables
@@ -25,6 +28,10 @@ uint8_t  sample_count = 0;
 
 //UART variables
 uint16_t tx_buffer_pos = 0;
+
+//SPI variables
+uint8_t spi_delay = 0;
+
 
 //function prototypes
 void hardware_init(void);
@@ -46,6 +53,7 @@ void fsm_update_state(void)
         case INIT:
         {
             hardware_init();
+            spi_tx_buffer[0] = 0x1;
             current_state = ADC_SAMPLE;
             break;
         }
@@ -55,15 +63,50 @@ void fsm_update_state(void)
             get_adc_samples();
             sample_count++;
 
-            if (sample_count == 15)
+            if (sample_count == 7)
+                current_state = SPI_COMM;
+            else if (sample_count == 15)
                 current_state = PROCESS;
+            break;
+        }
+
+        case SPI_COMM:
+        {
+
+            get_adc_samples();
+            sample_count++;
+
+
+            spi_delay++;
+
+            if (spi_delay == 4)
+            {
+                spi_tx_buffer[0]++;
+                spi_tx_buffer[1] = spi_tx_buffer[0] - 1;
+                spi_tx_buffer[2] = spi_tx_buffer[1] - 1;
+                spi_tx_buffer[3] = spi_tx_buffer[2] - 1;
+
+                dma_init_spi_tx(spi_tx_buffer);
+
+                spi_delay = 0;
+
+                dma_arm_tx();
+                spi_trigger_tx();
+            }
+
+
+            current_state = ADC_SAMPLE;
             break;
         }
 
         case PROCESS:
         {
+
+            dma_init_uart_tx(tx_buffer);
+
             get_adc_samples();
             calculate_average_adc_values();
+
             process_uart();
             current_state = ADC_SAMPLE;
             break;
@@ -78,8 +121,9 @@ void hardware_init(void)
     clock_init();
     scheduler_timer_init();
     uart_init();
-    dma_init_uart_rx(rx_buffer);
+    spi_init();
     dma_init_uart_tx(tx_buffer);
+    dma_init_uart_rx(rx_buffer);
     dma_init_adc(adc_buffer);
     adc_init();
 }
@@ -102,15 +146,20 @@ void calculate_average_adc_values(void)
 
 void process_uart(void)
 {
-    if (dma_get_arm_state_uart_rx() == 0)
+    // UART is processed only if a message was received
+    if (dma_get_arm_state_rx() == 0)
     {
         // Clear the transmit buffer
         uint16_t i = 0;
         for (i = 0; i < TX_BUFFER_SIZE; i++)
             tx_buffer[i] = 0;
 
+        // load the buffer with message (send happens later)
+        // echo the message (selection) received on UART
         print_selection();
 
+        // respond to selection
+        // GPIO is instant, print is loading buffer (send happens later)
         if (rx_buffer[0] == '1')
             gpio_toggle_grn_led();
         else if (rx_buffer[0] == '2')
@@ -118,7 +167,11 @@ void process_uart(void)
         else if (rx_buffer[0] == '3')
             print_adc_results();
 
+        // load the buffer with menu (send happens later)
+        // reprint the menu
         print_menu();
+
+        // re-arm DMAs and trigger send
         print_execute_task();
     }
 }
@@ -128,8 +181,8 @@ void print_execute_task(void)
     if (tx_buffer_pos > 0)
     {
         tx_buffer_pos = 0;
-        dma_arm_uart_rx();
-        dma_arm_uart_tx();
+        dma_arm_rx();
+        dma_arm_tx();
         uart_trigger_tx();
     }
 }
@@ -141,6 +194,7 @@ void print(unsigned char* message)
         tx_buffer[tx_buffer_pos++] = message[i++];
 }
 
+// echo the message (selection) received on UART
 void print_selection(void)
 {
     unsigned char temp_str[2] = {0};
@@ -176,10 +230,10 @@ void clear_screen(void)
     uint8_t i = 0;
     unsigned char blank_row[64] = "                                                          \r\n\0";
 
-    for (i = 16; i > 0; i++)
+    for (i = 16; i == 0; i--)
         print(blank_row);
 
-    dma_arm_uart_tx();
+    dma_arm_tx();
     uart_trigger_tx();
     tx_buffer_pos = 0;
 }
